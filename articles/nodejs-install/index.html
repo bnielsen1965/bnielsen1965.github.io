@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<title>Node.js Install</title>
+<meta charset="utf-8">
+
+<link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&display=swap" rel="stylesheet">
+<link rel="stylesheet" type="text/css" href="index.css">
+<script src="https://cdn.jsdelivr.net/gh/google/code-prettify@master/loader/run_prettify.js"></script>
+
+</head>
+<body>
+
+<div class="box clearfix">
+  <div class="box-header">Node.js Install</div>
+  <div class="box-content">
+    While developing linux services with Node.js I found myself switching between various versions
+    of Node.js and eventually it just made sense to create a Bash script to manage the process of
+    switching between versions.<br>
+    <br>
+    <a href="https://github.com/bnielsen1965/nodejs-install">nodejs-install</a><br>
+    <br>
+    Rather than hunt for the needed download and manually installing all that is required is to
+    run a simple command...<br>
+    <pre>sudo ./nodejs-install.sh install -v 10.15.3</pre>
+
+    <h3>Auto Download</h3>
+    After validating the version on the download page, the script checks to see if the requested
+    version is alredy installed. If the version is already installed then the download step is
+    automatically skipped and the existing install is configured as the system default.<br>
+    <pre class="prettyprint lang-bash">
+      # install nodejs
+      function InstallNodeJS()
+      {
+        IsRoot
+        # get version details in array (filename version platform architecture)
+        local version=($(VersionAvailable "$NODE_PLATFORM" "$NODE_ARCHITECTURE"))
+        if [[ -z "$version" ]]; then exit 1; fi
+        local node_version="${version[1]}" # may differ if search was in "latest"
+        local node_file="${version[0]}"
+        local node_install_dir=$(VersionPath $node_version)
+        local node_download_path="${NODE_SELECTED_WEB_PATH}/v${NODE_VERSION}/${node_file}"
+
+        mkdir -p "$INSTALL_PATH"
+        cd $INSTALL_PATH
+
+        # get node package if not installed
+        if [ ! -d $node_install_dir ]; then
+          wget "$node_download_path" -O "$node_file"
+          local wgetreturn=$?
+          if [[ $wgetreturn -ne 0 ]]; then
+            Die "Download $node_download_path failed"
+          fi
+          # extract
+          tar xf "$node_file"
+          # remove tar
+          rm -f "$node_file"
+        fi
+        if [ $(UsingAlternatives) ]; then
+          InstallAlternatives "$INSTALL_PATH/$node_install_dir" "$node_version"
+        else
+          InstallSymlinks "$INSTALL_PATH/$node_install_dir"
+        fi
+        echo "Install complete."
+      }
+    </pre>
+    <br>
+
+    <h3>Symlinks or Alternatives</h3>
+    Some linux distributions include the <a href="https://linux.die.net/man/8/alternatives">alternatives</a>
+    command to manage symbolic links but the script is designed to manage the symbolic links when alternatives
+    is not available.<br>
+    <pre class="prettyprint lang-bash">
+      # check if system uses alternatives
+      function UsingAlternatives() {
+        command -v update-alternatives
+        if [ $? -eq 0 ]; then
+          true
+        else
+          false
+        fi
+      }
+
+      # install in alternatives
+      function InstallAlternatives()
+      {
+        local node_install_path=$1;
+        local node_version=$2
+        local priority=`echo $node_version | sed 's/[\.v]//g'`
+        update-alternatives --install /usr/bin/node node "$node_install_path/bin/node" "$priority"
+        update-alternatives --set node "$node_install_path/bin/node"
+        update-alternatives --install /usr/bin/npm npm "$node_install_path/bin/npm" "${priority}"
+        update-alternatives --set npm "$node_install_path/bin/npm"
+        if [ -f "$node_install_path/bin/npx" ]; then
+          update-alternatives --install /usr/bin/npx npx "$node_install_path/bin/npx" "${priority}"
+          update-alternatives --set npx "$node_install_path/bin/npx"
+        fi
+      }
+
+
+      # install as symlink
+      function InstallSymlinks()
+      {
+        local node_install_path=$1;
+        ln -sf "$node_install_path/bin/node" "$BIN_PATH/node"
+        ln -sf "$node_install_path/bin/npm" "$BIN_PATH/npm"
+        if [ -f "$node_install_path/bin/npx" ]; then
+          ln -sf "$node_install_path/bin/npx" "$BIN_PATH/npx"
+        fi
+      }
+    </pre>
+  </div>
+</div>
+
+</body>
+</html>
