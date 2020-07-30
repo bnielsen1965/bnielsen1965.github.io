@@ -3,6 +3,9 @@ body {
 	font-family: 'Roboto Mono', monospace;
 }
 
+.icon {
+  margin: 2px 2px 0 0;
+}
 
 .box {
   box-sizing: border-box;
