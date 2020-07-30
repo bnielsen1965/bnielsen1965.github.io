@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<title>Ironhead</title>
+<meta charset="utf-8">
+
+<link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&display=swap" rel="stylesheet">
+<link rel="stylesheet" type="text/css" href="index.css">
+
+</head>
+<body>
+
+<div class="box clearfix">
+  <div class="box-header">Ironhead</div>
+  <div class="box-content">
+    <h3>...the search for intelligent life...</h3>
+
+    Long ago salvaged, Ironhead was a cluster of six headless nodes with one main node booting
+    from a RAID1 array and the remaining nodes using NFS root off the primary node.<br>
+    <br>
+    <a href="capture15.jpg"><img class="zoomimg" src="capture15.jpg" style="float: left;"></a>
+    <a href="capture16.jpg"><img class="zoomimg" src="capture16.jpg" style="float: left;"></a>
+
+    While some of the nodes were used to host random applications, I.E. webservers and game servers,
+    the primary purpose of the cluster was the processing of <a href="https://setiathome.berkeley.edu/">SETI@home</a>
+    and  <a href="https://foldingathome.org">Folding@Home</a> data.<br>
+    <br>
+    The rack is custom, welded together from some left over angle iron. The node hardware was off the shelf ATX motherboards
+    and power supplies with a pair of IDE hard drives and a 10/100 ethernet switch.<br>
+    <br>
+    <a href="https://getfedora.org/">Fedora Core Linux</a> was used as the host and guest operating systems with the host
+    configured to provide DHCP, TFTP and NFS to support PXE booting the driveless guest nodes while the kernel for the guest
+    nodes was custom compiled with options to support an NFS root file system.
+  </div>
+</div>
+
+</body>
+</html>
