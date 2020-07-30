@@ -3,8 +3,42 @@ body {
 	font-family: 'Roboto Mono', monospace;
 }
 
-.icon {
-  margin: 2px 2px 0 0;
+h2 {
+  margin-bottom: 0;
+}
+
+.icon-selected {
+  background-color: #ddf !important;
+}
+
+button.icon-select {
+    background: transparent;
+    color: blue;
+    border: none;
+    outline: 0;
+    cursor: pointer;
+}
+button.icon-select:hover {
+    color: firebrick;
+}
+
+li.icon-li {
+  height: 28px;
+}
+li.icon-group-c {
+  list-style-image: url(../icons/c-24.png);
+}
+li.icon-group-javascript {
+  list-style-image: url(../icons/nodejs-24.png);
+}
+li.icon-group-bash {
+  list-style-image: url(../icons/bash-24.png);
+}
+li.icon-group-hardware {
+  list-style-image: url(../icons/server-24.png);
+}
+li.icon-group-github {
+  list-style-image: url(../icons/github-24.png);
 }
 
 .box {
