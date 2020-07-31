@@ -15,23 +15,24 @@
 <div class="box clearfix">
   <div class="box-header">Node.js Install</div>
   <div class="box-content">
-    While developing linux services with Node.js I found myself switching between various versions
-    of Node.js and eventually it just made sense to create a Bash script to manage the process of
+    While developing linux services with <a href="https://nodejs.org">Node.js</a> I found myself switching between various versions
+    of Node.js and eventually it just made sense to create a <a href="https://www.gnu.org/software/bash/">Bash</a> script to manage the process of
     switching between versions.<br>
     <br>
-    <a href="https://github.com/bnielsen1965/nodejs-install">nodejs-install</a><br>
+    <a href="https://github.com/bnielsen1965/nodejs-install">nodejs-install github repository</a><br>
     <br>
     Rather than hunt for the needed download and manually installing all that is required is to
     run a simple command...<br>
     <pre>sudo ./nodejs-install.sh install -v 10.15.3</pre>
 
-    As demostrated in the following video, the process is simple. Clone the git repository then execute the
+    As demonstrated in the following video, the process is simple. Use <a href="https://git-scm.com/">git</a> to clone
+    the <a href="https://github.com/bnielsen1965/nodejs-install">nodejs-install repository</a>, then execute the
     install script with root permissions while passing the install command and the version option. The Node.js
-    install package will be downloaded if needed and setup for global use. If the package was previously installed
-    the download is skipped and the selected version is set as the global default. In the demonstration I install 
+    install package will be downloaded and setup for global use. If the package was previously installed
+    the download is skipped and the selected version is set as the global default. In the demonstration I install
     an older version of Node.js, test the installed version, then install a newer version of Node.js, again test
     the installed version, and finally run the install command for the older version again which will skip the
-    download and when complete I again test the installed version.
+    download and when complete I again test the installed version.<br>
     <br>
     <video controls width="800">
       <source src="nodejs-install.webm" type="video/webm">
