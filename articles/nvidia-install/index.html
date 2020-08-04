@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<title>Nvidia Linux Binary Driver Install Scripts</title>
+<meta charset="utf-8">
+
+<link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&display=swap" rel="stylesheet">
+<link rel="stylesheet" type="text/css" href="index.css">
+<script src="https://cdn.jsdelivr.net/gh/google/code-prettify@master/loader/run_prettify.js"></script>
+
+</head>
+<body>
+
+<div class="box clearfix">
+  <div class="box-header">Nvidia Linux Binary Driver Install Scripts</div>
+  <div class="box-content">
+    For many applications the open source <a href="https://nouveau.freedesktop.org/wiki/">nouveau graphics driver</a>
+    for Nvidia GPUs provides acceptable performance on Linux. However, in more demanding
+    applications, especially gaming, Linux users will find it necessary to install
+    the proprietary Nvidia graphics drivers when relying on an Nvidia GPU.<br>
+    <br>
+    Many Linux distributions or third party repositories provide pre-packaged Nvidia
+    binary drivers but in some cases it may be necessary to install the drivers manually.
+    There are helpful instructions around the web, my favorite being the <a href="https://www.if-not-true-then-false.com/2015/fedora-nvidia-guide/">if-not-true-then-false</a>
+    articles. But piecing together commands can get cumbersome or difficult, especially
+    when you add UEFI to the mix which will require driver signing.<br>
+    <br>
+    To make things easier I put together some scripts to simplify some of the installation
+    steps. The <a href="https://github.com/bnielsen1965/nvidia-install-scripts">nvidia-install-scripts</a>
+    project contains a handful of Bash scripts to assist wih setting up the keys for
+    kernel module signing as well as scripts for installation of the Nvidia binary driver.<br>
+    <br>
+
+    <h3>Kernel Module Signing Keys</h3>
+    A custom key pair needs to be created with openssl and installed as a machine owner key.
+    The make-key.sh and import-key.sh scripts contain the commands to perform this task.<br>
+    <h4>Create key pair (make-key.sh)</h4>
+    <pre class="prettyprint lang-bash">
+      #!/bin/bash
+
+      openssl req -new -x509 -newkey rsa:2048 -keyout ./nvidia.key -outform DER -out ./nvidia.der -nodes -days 36500 -subj "/CN=Graphics Drivers"
+    </pre>
+    <h4>Install machine owner key (import-key.sh)</h4>
+    <pre class="prettyprint lang-bash">
+      #!/bin/bash
+
+      mokutil --import ./nvidia.der
+    </pre>
+    These scripts are only needed the first time the installation is performed. The same
+    key will be used to sign any future Nvidia kernel module installs.<br>
+    <br>
+
+    <h3>Enable/Disable GUI Interface</h3>
+    When performing a driver installation or upgrade it will be necessary to boot into
+    a non-gui mode to run the install commands and a then switch back when finished.
+    The nogui-target.sh and gui-target.sh scripts are used to switch modes between
+    reboots.<br>
+    <h4>Disable GUI mode (nogui-target.sh)</h4>
+    <pre class="prettyprint lang-bash">
+      #!/bin/bash
+
+      systemctl set-default multi-user.target
+    </pre>
+    <h4>Enable GUI mode (gui-target.sh)</h4>
+    <pre class="prettyprint lang-bash">
+      #!/bin/bash
+
+      systemctl set-default graphical.target
+    </pre>
+
+    <h3>Driver Install (signed-install.sh)</h3>
+    And then there is the actual installation script that performs a signed module
+    install using the Nvidia binary installer and the previously generated signing key.<br>
+    <pre class="prettyprint lang-bash">
+      #!/bin/bash
+
+      PRIVATE_KEY="/root/nvidia/nvidia.key"
+      PUBLIC_KEY="/root/nvidia/nvidia.der"
+
+      NVIDIA_INSTALLER="$1"
+
+      if [ -z "$NVIDIA_INSTALLER" ]; then
+      	echo "Specify installer to use"
+      	exit 1
+      fi
+
+      if [ ! -f "./$NVIDIA_INSTALLER" ]; then
+      	echo "Install not found, $NVIDIA_INSTALLER"
+      	exit 1
+      fi
+
+      if [ ! -f "$PRIVATE_KEY" ]; then
+      	echo "Private key not found, $PRIVATE_KEY"
+      	exit 1
+      fi
+
+      if [ ! -f "$PUBLIC_KEY" ]; then
+      	echo "Public key not found, $PUBLIC_KEY"
+      	exit 1
+      fi
+
+      echo "Running installer $NVIDIA_INSTALLER"
+
+      ./$NVIDIA_INSTALLER \
+      --module-signing-secret-key="$PRIVATE_KEY" \
+      --module-signing-public-key="$PUBLIC_KEY"
+    </pre>
+
+
+  </div>
+</div>
+
+</body>
+</html>
