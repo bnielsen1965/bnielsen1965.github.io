@@ -35,10 +35,13 @@ li.icon-group-bash {
   list-style-image: url(../icons/bash-24.png);
 }
 li.icon-group-hardware {
-  list-style-image: url(../icons/server-24.png);
+  list-style-image: url(../icons/hardware-24.png);
 }
 li.icon-group-github {
   list-style-image: url(../icons/github-24.png);
+}
+li.icon-group-art {
+  list-style-image: url(../icons/art-24.png);
 }
 
 .box {
