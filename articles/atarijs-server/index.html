@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<title>Atari Drive Emulation NodeJS Server</title>
+<meta charset="utf-8">
+
+<link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&display=swap" rel="stylesheet">
+<link rel="stylesheet" type="text/css" href="index.css">
+<script src="https://cdn.jsdelivr.net/gh/google/code-prettify@master/loader/run_prettify.js"></script>
+
+</head>
+<body>
+
+<div class="box clearfix">
+  <div class="box-header">Atari Drive Emulation NodeJS Server</div>
+  <div class="box-content">
+    Atari introduced a line of <a href="https://en.wikipedia.org/wiki/Atari_8-bit_family">8-bit home computers</a>
+    in 1979 which included <a href="https://en.wikipedia.org/wiki/Atari_SIO">a serial interface</a>
+    that for peripheral devices including 5 1/4 inch floppy drives. Various modern
+    interaces have been developed to emulate the Atari floppy drives using software
+    on a PC and an adapter to connect an <a href="https://en.wikipedia.org/wiki/RS-232">RS-232 serial port</a>
+    to the Atari SIO port. The <a href="https://github.com/bnielsen1965/atarijs-server">atarijs-server</a>
+    is an application written for <a href="https://nodejs.org">NodeJS</a> to emulate
+    multiple Atari floppy drives and provide a web based interface for loading floppy
+    disk images into the emulated drives.
+    <br>
+    <br>
+    <b>Web interface screenshot...</b><br>
+    <img class="zoomimg" src="atarijs-ss.png">
+    <br>
+    <br>
+
+    <h3>RS-232 to SIO Adapter</h3>
+    The Atari SIO signal levels are 0 and 5 volts while the RS-232 standard may be
+    -3 and +3 volts to -15 and +15 volts. These differences in voltage necessitate
+    an adapter to switch between the two voltage ranges. While the atarijs-server
+    application may work with any of the existing adapter designs it was developed
+    with a simple adapter that relies on a single 74HC14 integrated circuit and a
+    USB to RS-232 adapter which outputs signals at the lower range of the standard.
+    <br>
+    <br>
+    <b>Atari SIO to RS-232 cable and RS-232 to USB cable..</b><br>
+    <img class="zoomimg" src="cables.png">
+    <br>
+    <br>
+    This hardware design should be used with caution as it has not been tested
+    extensively. The design is simple with the Atari SIO +5 volt ready signal used
+    to power the 74HC14 hex inverter Schmitt trigger gates and three of the gates
+    used for the data transmit, data recieve, and the SIO command signal.
+    <br>
+    <br>
+    <b>Schematic for 74HC14 adapter circuit...</b><br>
+    <img class="zoomimg" src="schematic.png">
+    <br>
+    <br>
+
+    <h3>Demonstration of atarijs-server in action...</h3>
+    In the following video vlc is used to capture video from an Atari 130XE connected
+    to a PC with the 74HC14 based RS-232 to SIO adatper. In a terminal on the PC
+    the atarijs-server application has been installed and is executed with the node
+    engine. The web interface is then loaded into the Chrome browser by opening
+    http://localhost:8080. The first drive is loaded with a floppy that contains
+    smart dos and the Atari is then booted. After smart dos is loaded a second
+    drive is created and another floppy is dragged into the new drive where the
+    Fuji Boink demo is saved. The demo is loaded and executed from the floppy.
+    <video controls width="1024">
+      <source src="load-drive.webm" type="video/webm">
+      Sorry, your browser doesn't support embedded videos.
+    </video>
+    <br>
+    <br>
+
+
+  </div>
+</div>
+
+</body>
+</html>
