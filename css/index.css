@@ -44,6 +44,32 @@ li.icon-group-art {
   list-style-image: url(../icons/art-24.png);
 }
 
+span.icon-span {
+	width: 24px;
+	height: 24px;
+	margin: 2px 2px;
+	display: inline-block;
+}
+
+span.icon-group-c {
+	background: url(../icons/c-24.png);
+}
+span.icon-group-javascript {
+	background: url(../icons/nodejs-24.png);
+}
+span.icon-group-bash {
+	background: url(../icons/bash-24.png);
+}
+span.icon-group-hardware {
+	background: url(../icons/hardware-24.png);
+}
+span.icon-group-github {
+	background: url(../icons/github-24.png);
+}
+span.icon-group-art {
+	background: url(../icons/art-24.png);
+}
+
 .box {
   box-sizing: border-box;
   border: 1px solid #000;
