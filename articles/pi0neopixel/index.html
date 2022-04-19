@@ -60,10 +60,24 @@ time  +-------+--------+
     to drive the LEDs.<br>
     <br>
 
+
+    <h4>Enable SPI in /boot/config.txt</h4>
+    <pre>
+    [all]
+    dtparam=spi=on
+    </pre>
+
+    <h4>Raspberry Pi Zero to WS2812B-8</h4>
+    The Raspberry Pi Zero provides the +5V (Pin 2) and Ground (Pin 14) to power
+    the WS2812B-8 LED PCB and the SPI MOSI (Pin 19) provides the data signal to
+    program the LED display.<br>
+    <img src="pi0neopixel-ws2812b-8.png"><br>
+
+    <h4>Bits to Nybles to Bytes</h4>
     To combine the clock and data each bit in the 3 RGB bytes must be converted
     into a clock cycle. And these clock cycles must have shorter pulse widths for
     0 bits and longer pules widths for the 1 bits. To accomplish this each data
-    bit will be represented by 4 signal bits to allow shapping of the clock signal
+    bit will be represented by 4 signal bits to allow shaping of the clock signal
     with variable widths.<br>
 
     <pre>
