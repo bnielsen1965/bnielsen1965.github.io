@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<title>Pi Zero NeoPixel</title>
+<meta charset="utf-8">
+
+<link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&display=swap" rel="stylesheet">
+<link rel="stylesheet" type="text/css" href="index.css">
+<script src="https://cdn.jsdelivr.net/gh/google/code-prettify@master/loader/run_prettify.js"></script>
+
+</head>
+<body>
+
+<div class="box clearfix">
+  <div class="box-header">Pi Zero NeoPixel</div>
+  <div class="box-content">
+    I needed a status indicator for a headless Raspberry Pi Zero project and came
+    across these <a href="(https://www.amazon.com/ACEIRMC-Channel-Color-Driven-Development-Arduino/dp/B08ZHCP55N/?th=1">PCBs with 8 RGB LEDs</a>
+    that looked interesting. The LEDs on the PCB are WS2812B that are chained
+    together and driven by a 3 wire connection, ground, five volts power, and a
+    single data line.<br>
+    <br>
+    To cut to the chase, the initial result is a simple C program in the <a href="https://github.com/bnielsen1965/pi0neopixel">pi0neopixel</a>
+    repo that provides a demo light show on the LED strip.<br>
+
+    <h3>Clocks and Bits</h3>
+    The data signal is a combination of a clock and data bits where the pulse
+    width of each half of a clock cycle determines if the bit for that cycle has
+    a value of 0 or 1.
+    Note in the following square wave signals the difference in the time that the
+    signal is high versus low for a 0 value bit and a 1 value bit. While the cycle
+    time for each clock pulse is the same the time that the clock signal remains
+    high is shorter for the 0 bit and longer for a 1 bit.<br>
+    <br>
+    <pre>
+      <= clock cycle =>
+       ______
+0 bit |      |        |
+      |      |________|
+
+       _________
+1 bit |         |     |
+      |         |_____|
+
+time  +-------+--------+
+    </pre>
+    Each LED pixel takes an RGB value made up of 3 bytes to make up the color
+    components of the pixel, and this results in a 24 bit value for each LED.
+    And for the LED strip used in this project there are 8 pixels * 24 bits for
+    a total of 192 bits, or clock cycles, that need to be applied to the data
+    line to program the color for each LED in the strip.<br>
+
+    <h3>Serial Bit Hacking</h3>
+    The Raspberry Pi Zero can be configured to provide a <a href="https://en.wikipedia.org/wiki/Serial_Peripheral_Interface">SPI interface</a>
+    for serial communication and the data for the LED strip is serial. However,
+    the SPI uses a separate data clock and we need and combination clock and data
+    signal. So we will ignore the SPI clock signal and use some bit hacking to
+    turn the SPI data signal into the combination clock and data signal needed
+    to drive the LEDs.<br>
+    <br>
+
+    To combine the clock and data each bit in the 3 RGB bytes must be converted
+    into a clock cycle. And these clock cycles must have shorter pulse widths for
+    0 bits and longer pules widths for the 1 bits. To accomplish this each data
+    bit will be represented by 4 signal bits to allow shapping of the clock signal
+    with variable widths.<br>
+
+    <pre>
+      data   signal
+       0  =>  1000
+       1  =>  1110
+    </pre>
+
+    Each byte in the RGB value will be converted into a total of 4 signal bytes.
+    As an example, assume we have an RGB value with the R byte value is 218 which
+    in binary is 0b11011010. Each bit in this byte must be converted into the 4
+    bit representation for the signal...
+    <pre>
+ (R data byte)    1    1      0    1      1    0      1    0
+                  v    v      v    v      v    v      v    v
+(4 Signal Bytes) 1110 1110 | 1000 1110 | 1110 1000 | 1110 1000
+    </pre>
+    The R byte value of 218 now becomes 4 signal bytes with the values 238, 142,
+    232, 232. Also notice in the binary values how the signal always starts high
+    for each data bit and toggles low before the next data bit.<br>
+    The following function is from the C demo program and demonstrates how a single
+    byte value from the RGB data is convereted into the 4 signal bytes that will
+    be sent out on the SPI data line.
+
+    <pre class="prettyprint lang-c">
+
+      // define the nibble values when converting color bits into the NeoPixel signal
+      // values in the T0H-T0L and T1H-T1L format, may require adjustment for SPI speed
+      #define T0MSN 0x80 // Most significant nibble for 0 bit
+      #define T1MSN 0xE0 // Most significant nibble for 1 bit
+      #define T0LSN 0x08 // Least significant nibble for 0 bit
+      #define T1LSN 0x0E // Least significant nibble for 1 bit
+
+      // fill the buffer at the provided pointer with the NeoPixel T0H-T0L/T1H-T1L signal for the given RGBW byte
+      unsigned char* fillColor(unsigned char* colorPt, int RGBWvalue)
+      {
+      	int loop;
+      	unsigned char _temp;
+
+      	// loop through 4 sets of 2 bits for the given RGBW byte
+      	for (loop = 0; loop &lt; 4; loop++)
+      	{
+      		// take 2 most significant bits and spread them across one byte
+      		// into ws2812B signal format for T0H-T0L and T1H-T1L
+      		_temp = (RGBWvalue & 0x80) ? T1MSN : T0MSN;
+      		_temp |= (RGBWvalue & 0x40) ? T1LSN : T0LSN;
+      		// store signal byte in buffer
+      		*(colorPt++) = _temp;
+      		// shift to the next two bits
+      		RGBWvalue &lt;&lt;= 2;
+      	}
+
+      	// return the incremented pointer for potential reuse
+      	return colorPt;
+      }
+    </pre>
+
+    <h3>Demo Light Show</h3>
+    The C source code contains additional functions to facilitate the initialization,
+    SPI communication, and the light show demo logic. The end result is what is
+    shown in the following video...<br>
+    <br>
+    <video controls width="800">
+      <source src="lightshow.webm" type="video/webm">
+      Sorry, your browser doesn't support embedded videos.
+    </video>
+  </div>
+</div>
+
+</body>
+</html>
